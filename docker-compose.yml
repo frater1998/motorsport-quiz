@@ -1,0 +1,28 @@
+services:
+  motorsport-quiz:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: motorsport-quiz
+    restart: unless-stopped
+    ports:
+      # Porta 8087 esposta sull'host (configurabile in .env)
+      - "${PORT:-8087}:80"
+    environment:
+      - NODE_ENV=production
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.motorsport-quiz.rule=Host(`${SUBDOMAIN:-quiz.linuxbari.it}`)"
+      - "traefik.http.routers.motorsport-quiz.entrypoints=websecure"
+      - "traefik.http.routers.motorsport-quiz.tls=true"
+      - "traefik.http.routers.motorsport-quiz.tls.certresolver=${TRAEFIK_CERTRESOLVER:-letsencrypt}"
+      - "traefik.http.services.motorsport-quiz.loadbalancer.server.port=80"
+    # Se Traefik usa una rete Docker condivisa (es. traefik-net), decommenta le righe sotto:
+    # networks:
+    #   - default
+    #   - traefik-net
+
+# networks:
+#   traefik-net:
+#     external: true
+#     name: ${TRAEFIK_NETWORK:-traefik-net}
