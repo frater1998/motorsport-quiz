@@ -12,17 +12,17 @@ services:
       - NODE_ENV=production
     labels:
       - "traefik.enable=true"
+      # Specifica esplicitamente a Traefik quale rete usare per comunicare col container
+      - "traefik.docker.network=${TRAEFIK_NETWORK:-proxy}"
       - "traefik.http.routers.motorsport-quiz.rule=Host(`${SUBDOMAIN:-quiz.linuxbari.it}`)"
       - "traefik.http.routers.motorsport-quiz.entrypoints=websecure"
       - "traefik.http.routers.motorsport-quiz.tls=true"
       - "traefik.http.routers.motorsport-quiz.tls.certresolver=${TRAEFIK_CERTRESOLVER:-letsencrypt}"
       - "traefik.http.services.motorsport-quiz.loadbalancer.server.port=80"
-    # Se Traefik usa una rete Docker condivisa (es. traefik-net), decommenta le righe sotto:
-    # networks:
-    #   - default
-    #   - traefik-net
+    networks:
+      - proxy
 
-# networks:
-#   traefik-net:
-#     external: true
-#     name: ${TRAEFIK_NETWORK:-traefik-net}
+networks:
+  proxy:
+    external: true
+    name: ${TRAEFIK_NETWORK:-proxy}

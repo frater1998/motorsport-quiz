@@ -40,36 +40,20 @@ Il container verrà compilato e avviato in pochi secondi. L'app risponderà loca
 
 ---
 
-## 3. Integrazione con Traefik
+## 3. Integrazione con Traefik (Rete `proxy`)
 
-A seconda di come è configurato Traefik sul tuo server, hai due modalità:
+Il file [`docker-compose.yml`](file:///home/francesco/Progetti/motorsport-quiz/docker-compose.yml) è già impostato con:
+- La label obbligatoria: `"traefik.docker.network=proxy"`
+- La connessione alla rete esterna: `proxy`
+- La porta interna del container: `80`
 
-### Modalità A: Tramite Rete Docker Condivisa (Consigliata)
-Se Traefik rileva automaticamente i container tramite una rete Docker (es. `traefik-net`, `traefik_default`, `proxy` o `web`):
+Se sul server hai fatto il pull:
+```bash
+git pull origin main
+docker compose up -d
+```
+Traefik individuerà subito l'IP del container sulla rete `proxy` senza generare l'errore Bad Gateway.
 
-1. Verifica il nome della rete del tuo Traefik:
-   ```bash
-   docker network ls
-   ```
-2. Nel file [`docker-compose.yml`](file:///home/francesco/Progetti/motorsport-quiz/docker-compose.yml) (o nel file `.env`), imposta il nome della rete:
-   ```yaml
-   services:
-     motorsport-quiz:
-       # ...
-       networks:
-         - default
-         - traefik-net
-
-   networks:
-     traefik-net:
-       external: true
-       name: traefik-net # Inserisci qui il nome esatto della tua rete Traefik
-   ```
-3. Riavvia con:
-   ```bash
-   docker compose up -d
-   ```
-   Traefik intercetterà automaticamente il container, creerà il router per `quiz.linuxbari.it` e richiederà il certificato SSL Let's Encrypt!
 
 ### Modalità B: Tramite File Provider Dinamico di Traefik (su porta 8087)
 Se invece gestisci i router di Traefik tramite un file YAML dinamico (es. `dynamic_conf.yml`), ti basta aggiungere questo blocco:
