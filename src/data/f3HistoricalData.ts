@@ -13,7 +13,8 @@ export const F3_CHAMPIONS: ChampionRecord[] = [
   { year: 2021, category: 'F3', driver: 'Dennis Hauger', team: 'Prema Racing', runnerUp: 'Jack Doohan', wins: 4, contextFact: 'Il pilota norvegese della Red Bull Junior dominò la stagione con 4 vittorie e 9 podi.' },
   { year: 2022, category: 'F3', driver: 'Victor Martins', team: 'ART Grand Prix', runnerUp: 'Zane Maloney', wins: 2, contextFact: 'Finale caotico a Monza interrotto dalla bandiera rossa; Martins fu incoronato campione per soli 5 punti.' },
   { year: 2023, category: 'F3', driver: 'Gabriel Bortoleto', team: 'Trident', runnerUp: 'Zak O\'Sullivan', wins: 2, contextFact: 'Bortoleto vinse il titolo matematicamente già durante le qualifiche di Monza grazie al distacco accumulato.' },
-  { year: 2024, category: 'F3', driver: 'Leonardo Fornaroli', team: 'Trident', runnerUp: 'Gabriele Minì', wins: 0, contextFact: 'Incredibile: il pilota italiano Fornaroli vinse il campionato mondiale F3 senza vincere nemmeno una gara, superando all\'ultima curva dell\'ultimo giro a Monza!' }
+  { year: 2024, category: 'F3', driver: 'Leonardo Fornaroli', team: 'Trident', runnerUp: 'Gabriele Minì', wins: 0, contextFact: 'Incredibile: il pilota italiano Fornaroli vinse il campionato mondiale F3 senza vincere nemmeno una gara, superando all\'ultima curva dell\'ultimo giro a Monza!' },
+  { year: 2025, category: 'F3', driver: 'Rafael Câmara', team: 'Trident', runnerUp: 'Nikola Tsolov', wins: 4, contextFact: 'Il brasiliano Rafael Câmara della Ferrari Driver Academy ha dominato la stagione F3 2025 con la Trident laureandosi campione con un round d\'anticipo.' }
 ];
 
 export const MACAU_GP_RACES: JuniorSeriesRace[] = [
@@ -76,5 +77,5 @@ export const MACAU_GP_RACES: JuniorSeriesRace[] = [
 
 export const F3_DRIVERS_ROSTER: Record<string, string[]> = {
   'historical': ['Valtteri Bottas', 'Daniil Kvyat', 'Alex Lynn', 'Esteban Ocon', 'Luca Ghiotto', 'Charles Leclerc', 'Alexander Albon', 'Antonio Fuoco', 'George Russell', 'Jack Aitken', 'Anthoine Hubert', 'Nikita Mazepin', 'Callum Ilott'],
-  'modern': ['Robert Shwartzman', 'Marcus Armstrong', 'Jehan Daruvala', 'Yuki Tsunoda', 'Oscar Piastri', 'Théo Pourchaire', 'Logan Sargeant', 'Frederik Vesti', 'Dennis Hauger', 'Jack Doohan', 'Arthur Leclerc', 'Victor Martins', 'Zane Maloney', 'Oliver Bearman', 'Gabriel Bortoleto', 'Zak O\'Sullivan', 'Paul Aron', 'Leonardo Fornaroli', 'Gabriele Minì', 'Luke Browning', 'Arvid Lindblad', 'Dino Beganovic']
+  'modern': ['Robert Shwartzman', 'Marcus Armstrong', 'Jehan Daruvala', 'Yuki Tsunoda', 'Oscar Piastri', 'Théo Pourchaire', 'Logan Sargeant', 'Frederik Vesti', 'Dennis Hauger', 'Jack Doohan', 'Arthur Leclerc', 'Victor Martins', 'Zane Maloney', 'Oliver Bearman', 'Gabriel Bortoleto', 'Zak O\'Sullivan', 'Paul Aron', 'Leonardo Fornaroli', 'Gabriele Minì', 'Luke Browning', 'Arvid Lindblad', 'Dino Beganovic', 'Rafael Câmara', 'Nikola Tsolov']
 };

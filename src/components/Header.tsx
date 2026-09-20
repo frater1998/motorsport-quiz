@@ -1,5 +1,5 @@
 import React from 'react';
-import { Volume2, VolumeX, Flag, Zap, Radio } from 'lucide-react';
+import { Volume2, VolumeX, Flag, Zap, Radio, Trophy } from 'lucide-react';
 import { LiveGpInfo } from '../types';
 
 interface HeaderProps {
@@ -8,6 +8,7 @@ interface HeaderProps {
   liveGp: LiveGpInfo | null;
   onGoHome?: () => void;
   isPlaying?: boolean;
+  onOpenLeaderboard?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -15,7 +16,8 @@ export const Header: React.FC<HeaderProps> = ({
   onToggleSound,
   liveGp,
   onGoHome,
-  isPlaying = false
+  isPlaying = false,
+  onOpenLeaderboard
 }) => {
   return (
     <header className="w-full bg-[#0d111a]/95 backdrop-blur border-b border-[#232936] sticky top-0 z-40 px-4 py-3">
@@ -69,6 +71,17 @@ export const Header: React.FC<HeaderProps> = ({
             <span className="hidden sm:inline">API</span>
             <span className="text-emerald-400 font-bold uppercase">LIVE</span>
           </div>
+
+          {onOpenLeaderboard && !isPlaying && (
+            <button
+              onClick={onOpenLeaderboard}
+              className="p-2 sm:px-2.5 sm:py-1.5 rounded-lg bg-[#151922] hover:bg-[#1f2634] text-amber-400 hover:text-amber-300 border border-[#232936] transition cursor-pointer flex items-center gap-1.5 text-xs font-racing"
+              title="Classifica Piloti Apex GP"
+            >
+              <Trophy className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline font-bold">CLASSIFICA</span>
+            </button>
+          )}
 
           <button
             onClick={onToggleSound}

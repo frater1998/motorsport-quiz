@@ -1,5 +1,5 @@
 import React from 'react';
-import { Flag, Gauge, Timer, Trophy, ShieldCheck, Sparkles, RefreshCw, Calendar, Radio } from 'lucide-react';
+import { Flag, Gauge, Timer, Trophy, ShieldCheck, Sparkles, RefreshCw, Calendar, Radio, User } from 'lucide-react';
 import { Category, Era, LiveGpInfo } from '../types';
 
 interface HomeScreenProps {
@@ -11,6 +11,10 @@ interface HomeScreenProps {
   liveGp: LiveGpInfo | null;
   isLoadingLive: boolean;
   onRefreshLive: () => void;
+  playerName: string;
+  onChangePlayerName: (name: string) => void;
+  onOpenLeaderboard: () => void;
+  leaderboardCount: number;
 }
 
 const CATEGORIES: Array<{ id: Category; name: string; tag: string; description: string; badgeColor: string }> = [
@@ -85,7 +89,11 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
   onStartGame,
   liveGp,
   isLoadingLive,
-  onRefreshLive
+  onRefreshLive,
+  playerName,
+  onChangePlayerName,
+  onOpenLeaderboard,
+  leaderboardCount
 }) => {
   return (
     <div className="w-full max-w-5xl mx-auto px-4 py-8 sm:py-12 space-y-10">
@@ -286,6 +294,54 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
         </div>
       </div>
 
+      {/* Step 3: Nome del Pilota */}
+      <div className="space-y-4">
+        <div className="flex items-center gap-2">
+          <span className="w-6 h-6 rounded-full bg-[#e10600] text-white font-digital font-bold text-xs flex items-center justify-center">
+            3
+          </span>
+          <h2 className="font-racing font-bold text-xl sm:text-2xl text-white uppercase tracking-wide">
+            Nome Pilota per la Classifica
+          </h2>
+        </div>
+
+        <div className="bg-[#121620] border border-[#232936] rounded-2xl p-5 sm:p-6 shadow-lg flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div className="flex-1 w-full max-w-lg">
+            <label className="text-xs font-racing text-slate-300 block mb-2">
+              Inserisci il tuo nome o nickname per comparire nella Classifica Mondiale:
+            </label>
+            <div className="relative">
+              <User className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <input
+                type="text"
+                value={playerName}
+                onChange={(e) => onChangePlayerName(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') onStartGame();
+                }}
+                placeholder="Es. Charles, Max, Francesco..."
+                maxLength={25}
+                className="w-full pl-10 pr-4 py-3 rounded-xl bg-[#0e121a] border border-[#263246] focus:border-[#e10600] focus:ring-2 focus:ring-[#e10600]/30 text-white font-racing text-base outline-none transition placeholder:text-slate-500"
+              />
+            </div>
+            <p className="text-[11px] text-slate-500 font-body mt-1.5">
+              Il punteggio e la precisione verranno registrati nella leaderboard mondiale a fine gara.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2.5 w-full md:w-auto self-stretch md:self-auto">
+            <button
+              type="button"
+              onClick={onOpenLeaderboard}
+              className="flex-1 md:flex-none px-5 py-3 rounded-xl bg-[#171f2c] hover:bg-[#202b3d] text-slate-200 hover:text-white border border-[#2b3a50] text-xs font-racing flex items-center justify-center gap-2 transition cursor-pointer"
+            >
+              <Trophy className="w-4 h-4 text-amber-400" />
+              <span>CLASSIFICA {leaderboardCount > 0 ? `(${leaderboardCount})` : ''}</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
       {/* Rules & Gameplay Highlights */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 pt-2">
         <div className="flex items-center gap-3 p-3.5 rounded-xl bg-[#10141e] border border-[#1f2636]">
@@ -319,14 +375,23 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
         </div>
       </div>
 
-      {/* Start Button */}
-      <div className="text-center pt-4 pb-6">
+      {/* Start Button & Actions */}
+      <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4 pb-6">
         <button
           onClick={onStartGame}
-          className="w-full sm:w-auto px-10 py-5 rounded-2xl bg-gradient-to-r from-[#e10600] via-[#ff2200] to-[#b30000] hover:from-[#ff1a1a] hover:to-[#cc0000] text-white font-digital font-black text-lg sm:text-xl tracking-wider shadow-2xl shadow-[#e10600]/40 hover:shadow-[#e10600]/70 hover:scale-[1.03] active:scale-[0.98] transition-all cursor-pointer flex items-center justify-center gap-3 mx-auto"
+          className="w-full sm:w-auto px-10 py-5 rounded-2xl bg-gradient-to-r from-[#e10600] via-[#ff2200] to-[#b30000] hover:from-[#ff1a1a] hover:to-[#cc0000] text-white font-digital font-black text-lg sm:text-xl tracking-wider shadow-2xl shadow-[#e10600]/40 hover:shadow-[#e10600]/70 hover:scale-[1.03] active:scale-[0.98] transition-all cursor-pointer flex items-center justify-center gap-3"
         >
           <Flag className="w-6 h-6 text-white" />
           <span>ACCENDI I MOTORI • SCENDI IN PISTA</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={onOpenLeaderboard}
+          className="w-full sm:w-auto px-6 py-5 rounded-2xl bg-[#141924] hover:bg-[#1d2535] text-slate-300 hover:text-white border border-[#253144] font-digital font-bold text-base tracking-wider transition-all cursor-pointer flex items-center justify-center gap-2.5"
+        >
+          <Trophy className="w-5 h-5 text-amber-400" />
+          <span>CLASSIFICA MONDIALE</span>
         </button>
       </div>
     </div>

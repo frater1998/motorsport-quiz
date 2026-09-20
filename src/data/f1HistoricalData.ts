@@ -50,7 +50,7 @@ export const F1_CHAMPIONS: ChampionRecord[] = [
   { year: 2022, category: 'F1', driver: 'Max Verstappen', team: 'Red Bull Racing', runnerUp: 'Charles Leclerc', wins: 15, contextFact: 'Introduzione delle monoposto ad effetto suolo: record di 15 vittorie in un anno per Verstappen.' },
   { year: 2023, category: 'F1', driver: 'Max Verstappen', team: 'Red Bull Racing', runnerUp: 'Sergio Pérez', wins: 19, contextFact: 'Stagione più dominante di sempre: 19 vittorie su 22 gare e 10 successi consecutivi per Verstappen.' },
   { year: 2024, category: 'F1', driver: 'Max Verstappen', team: 'Red Bull Racing', runnerUp: 'Lando Norris', wins: 9, contextFact: 'Quarto titolo consecutivo per l\'olandese con un\'epica rimonta sotto la pioggia battente a Interlagos.' },
-  { year: 2025, category: 'F1', driver: 'Max Verstappen', team: 'Red Bull Racing', runnerUp: 'Charles Leclerc', wins: 8, contextFact: 'La stagione 2025 ha visto una lotta serrata a quattro team tra Red Bull, Ferrari, McLaren e Mercedes.' }
+  { year: 2025, category: 'F1', driver: 'Lando Norris', team: 'McLaren', runnerUp: 'Max Verstappen', wins: 7, contextFact: 'Lando Norris ha conquistato il suo primo titolo iridato nel finale thriller di Abu Dhabi, battendo Max Verstappen per soli due punti (423 a 421) e riportando la McLaren al titolo mondiale piloti dopo 17 anni.' }
 ];
 
 // 2. F1 Constructors Champions 1990 - 2025
@@ -562,6 +562,45 @@ export const ICONIC_F1_RACES: HistoricalRace[] = [
     poleTeam: 'McLaren-Mercedes',
     podium: ['Charles Leclerc', 'Oscar Piastri', 'Lando Norris'],
     contextFact: 'Trionfo memorabile di Leclerc a Monza con una strategia audace a una sola sosta che ha mandato in estasi i tifosi ferraristi.'
+  },
+  {
+    year: 2025,
+    round: 8,
+    raceName: 'Gran Premio di Monaco',
+    circuitName: 'Monte Carlo',
+    country: 'Monaco',
+    winner: 'Lando Norris',
+    winnerTeam: 'McLaren-Mercedes',
+    pole: 'Lando Norris',
+    poleTeam: 'McLaren-Mercedes',
+    podium: ['Lando Norris', 'Charles Leclerc', 'Oscar Piastri'],
+    contextFact: 'Vittoria trionfale di Lando Norris partendo dalla pole position sulle celebri strade del Principato di Monaco.'
+  },
+  {
+    year: 2025,
+    round: 12,
+    raceName: 'Gran Premio di Gran Bretagna',
+    circuitName: 'Silverstone',
+    country: 'Regno Unito',
+    winner: 'Lando Norris',
+    winnerTeam: 'McLaren-Mercedes',
+    pole: 'Max Verstappen',
+    poleTeam: 'Red Bull Racing',
+    podium: ['Lando Norris', 'Oscar Piastri', 'Nico Hülkenberg'],
+    contextFact: 'Trionfo casalingo di Norris a Silverstone con doppietta McLaren e il clamoroso primo podio in carriera per Nico Hülkenberg con la Sauber.'
+  },
+  {
+    year: 2025,
+    round: 24,
+    raceName: 'Gran Premio di Abu Dhabi',
+    circuitName: 'Yas Marina',
+    country: 'Emirati Arabi Uniti',
+    winner: 'Max Verstappen',
+    winnerTeam: 'Red Bull Racing',
+    pole: 'Max Verstappen',
+    poleTeam: 'Red Bull Racing',
+    podium: ['Max Verstappen', 'Oscar Piastri', 'Lando Norris'],
+    contextFact: 'Gara decisiva per il mondiale: Verstappen vince dalla pole, ma il 3° posto basta a Lando Norris per laurearsi Campione del Mondo 2025 per soli 2 punti.'
   }
 ];
 

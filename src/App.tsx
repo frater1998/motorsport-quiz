@@ -1,11 +1,14 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Category, Era, ScreenState, QuizQuestion, GameStats, PlayerAnswer, LiveGpInfo } from './types';
+import { Category, Era, ScreenState, QuizQuestion, GameStats, PlayerAnswer, LiveGpInfo, LeaderboardEntry } from './types';
 import { getLatestF1Race } from './api/motorsportApi';
 import { generateQuizQuestions } from './engine/questionEngine';
 import { Header } from './components/Header';
 import { HomeScreen } from './components/HomeScreen';
 import { QuizScreen } from './components/QuizScreen';
 import { PodiumSummary } from './components/PodiumSummary';
+import { PlayerNameModal } from './components/PlayerNameModal';
+import { LeaderboardModal } from './components/LeaderboardModal';
+import { getLeaderboard, getLastPlayerName, setLastPlayerName, clearLeaderboard } from './utils/leaderboard';
 import { sound } from './utils/sound';
 import { Flag, Loader2 } from 'lucide-react';
 
@@ -17,6 +20,13 @@ export function App() {
   const [stats, setStats] = useState<GameStats | null>(null);
   const [answersLog, setAnswersLog] = useState<PlayerAnswer[]>([]);
   const [soundEnabled, setSoundEnabled] = useState<boolean>(true);
+  const [recentQuestionTitles, setRecentQuestionTitles] = useState<string[]>([]);
+
+  // Player Name and Leaderboard States
+  const [playerName, setPlayerName] = useState<string>(() => getLastPlayerName());
+  const [isNameModalOpen, setIsNameModalOpen] = useState<boolean>(false);
+  const [isLeaderboardModalOpen, setIsLeaderboardModalOpen] = useState<boolean>(false);
+  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>(() => getLeaderboard());
 
   // Live Auto-Update Grand Prix Information
   const [liveGp, setLiveGp] = useState<LiveGpInfo | null>(null);
@@ -47,8 +57,10 @@ export function App() {
     setSoundEnabled(nextVal);
   };
 
-  // Start Race
-  const handleStartGame = async () => {
+  // Launch Game Core Logic
+  const launchGame = async (name: string) => {
+    setPlayerName(name);
+    setLastPlayerName(name);
     sound.playLightsOut();
     setScreen('LOADING');
 
@@ -57,9 +69,12 @@ export function App() {
         category,
         era,
         liveGp,
-        count: 10
+        count: 10,
+        excludeQuestions: recentQuestionTitles
       });
 
+      const newTitles = generated.map(q => q.question);
+      setRecentQuestionTitles(prev => [...prev, ...newTitles].slice(-50));
       setQuestions(generated);
       setScreen('PLAYING');
     } catch (err) {
@@ -68,38 +83,54 @@ export function App() {
     }
   };
 
+  // Start Race (Checks if player name is provided)
+  const handleStartGame = () => {
+    if (!playerName.trim()) {
+      setIsNameModalOpen(true);
+      return;
+    }
+    launchGame(playerName.trim());
+  };
+
+  // Name Confirmed from Modal
+  const handleConfirmName = (confirmedName: string) => {
+    setIsNameModalOpen(false);
+    launchGame(confirmedName);
+  };
+
   // Game Finished
   const handleFinishGame = (finalStats: GameStats, logs: PlayerAnswer[]) => {
     setStats(finalStats);
     setAnswersLog(logs);
+    setLeaderboard(getLeaderboard());
     setScreen('SUMMARY');
   };
 
   // Play Again (generate new set of questions)
-  const handlePlayAgain = async () => {
-    sound.playLightsOut();
-    setScreen('LOADING');
-
-    try {
-      const generated = await generateQuizQuestions({
-        category,
-        era,
-        liveGp,
-        count: 10
-      });
-
-      setQuestions(generated);
-      setScreen('PLAYING');
-    } catch (err) {
-      console.error('Errore durante la rigenerazione:', err);
-      setScreen('HOME');
-    }
+  const handlePlayAgain = () => {
+    launchGame(playerName.trim() || 'Pilota');
   };
 
   // Return to Home
   const handleGoHome = () => {
     sound.playClick();
+    setLeaderboard(getLeaderboard());
     setScreen('HOME');
+  };
+
+  // Open Leaderboard Modal
+  const handleOpenLeaderboard = () => {
+    sound.playClick();
+    setLeaderboard(getLeaderboard());
+    setIsLeaderboardModalOpen(true);
+  };
+
+  // Clear Leaderboard
+  const handleClearLeaderboard = () => {
+    if (window.confirm('Sei sicuro di voler cancellare l\'intera classifica salvata?')) {
+      clearLeaderboard();
+      setLeaderboard([]);
+    }
   };
 
   return (
@@ -111,6 +142,7 @@ export function App() {
         liveGp={liveGp}
         onGoHome={handleGoHome}
         isPlaying={screen === 'PLAYING'}
+        onOpenLeaderboard={handleOpenLeaderboard}
       />
 
       {/* Main Content Area */}
@@ -125,6 +157,10 @@ export function App() {
             liveGp={liveGp}
             isLoadingLive={isLoadingLive}
             onRefreshLive={fetchLiveFeed}
+            playerName={playerName}
+            onChangePlayerName={setPlayerName}
+            onOpenLeaderboard={handleOpenLeaderboard}
+            leaderboardCount={leaderboard.length}
           />
         )}
 
@@ -154,6 +190,7 @@ export function App() {
         {screen === 'PLAYING' && questions.length > 0 && (
           <QuizScreen
             questions={questions}
+            playerName={playerName}
             onFinishGame={handleFinishGame}
             onQuitGame={handleGoHome}
           />
@@ -163,11 +200,31 @@ export function App() {
           <PodiumSummary
             stats={stats}
             answersLog={answersLog}
+            playerName={playerName}
+            category={category}
+            era={era}
             onPlayAgain={handlePlayAgain}
             onGoHome={handleGoHome}
+            onChangePlayerName={() => setIsNameModalOpen(true)}
           />
         )}
       </main>
+
+      {/* Driver Name Prompt Modal */}
+      <PlayerNameModal
+        isOpen={isNameModalOpen}
+        onClose={() => setIsNameModalOpen(false)}
+        onConfirm={handleConfirmName}
+        initialName={playerName}
+      />
+
+      {/* Global Leaderboard Modal */}
+      <LeaderboardModal
+        isOpen={isLeaderboardModalOpen}
+        onClose={() => setIsLeaderboardModalOpen(false)}
+        entries={leaderboard}
+        onClear={handleClearLeaderboard}
+      />
 
       {/* Motorsport Footer */}
       <footer className="w-full py-4 px-4 border-t border-[#1c2230] text-center text-xs font-racing text-slate-500 bg-[#0a0d14]/90">

@@ -119,3 +119,18 @@ export interface GameStats {
   superlicenseRank: string;
   superlicenseColor: string;
 }
+
+export interface LeaderboardEntry {
+  id: string;
+  playerName: string;
+  totalScore: number;
+  correctCount: number;
+  totalQuestions: number;
+  accuracy: number;
+  category: Category;
+  era: Era;
+  superlicenseTitle: string;
+  superlicenseColor: string;
+  date: string; // ISO string
+}
+

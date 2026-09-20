@@ -124,7 +124,57 @@ async function runVerification() {
   console.log(`Risultato Superlicenza per 6000 PTS (8/10 corretti):`);
   console.log(`   - Grado: ${stats.superlicenseTitle}`);
   console.log(`   - Descrizione: ${stats.superlicenseRank}`);
-  console.log(`   - Precisione: ${stats.accuracy}%`);
+  // 5. Test Randomization and Anti-Repeat Across Consecutive Games
+  console.log('\n--- TEST 5: RANDOMIZZAZIONE DOMANDE E ANTI-RIPETIZIONE FRA PARTITE ---');
+  const game1 = await generateQuizQuestions({
+    category: 'ALL',
+    era: 'all',
+    liveGp,
+    count: 10
+  });
+
+  const game1Titles = game1.map(q => q.question);
+  console.log(`Partita 1 - Prima domanda: "${game1[0].question}"`);
+
+  const game2 = await generateQuizQuestions({
+    category: 'ALL',
+    era: 'all',
+    liveGp,
+    count: 10,
+    excludeQuestions: game1Titles
+  });
+
+  const game2Titles = game2.map(q => q.question);
+  console.log(`Partita 2 (con anti-repeat) - Prima domanda: "${game2[0].question}"`);
+
+  // Check overlap between game1 and game2
+  const overlap = game2Titles.filter(t => game1Titles.includes(t));
+  console.log(`Domande duplicate tra Partita 1 e Partita 2: ${overlap.length} su 10`);
+  if (overlap.length === 0) {
+    console.log('✅ PASS: Nessuna domanda duplicata tra due partite consecutive!');
+  } else {
+    console.warn(`⚠️ Warning: Trovate ${overlap.length} domande duplicate.`);
+  }
+
+  // Verify that live questions are not stuck at index 0
+  let liveIndexAtZeroCount = 0;
+  for (let i = 0; i < 5; i++) {
+    const testQuiz = await generateQuizQuestions({
+      category: 'ALL',
+      era: 'all',
+      liveGp,
+      count: 10
+    });
+    if (testQuiz[0].isLiveAutoUpdated) {
+      liveIndexAtZeroCount++;
+    }
+  }
+  console.log(`Frequenza di domanda Live al primo posto (su 5 tentativi): ${liveIndexAtZeroCount}/5`);
+  if (liveIndexAtZeroCount < 5) {
+    console.log('✅ PASS: Le domande Live non sono più fisse in prima posizione!');
+  } else {
+    console.warn('⚠️ Warning: Le domande Live appaiono sempre all\'inizio.');
+  }
 
   console.log('\n🏁 TUTTI I TEST COMPLETATI CON SUCCESSO!\n');
 }

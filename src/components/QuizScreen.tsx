@@ -9,6 +9,7 @@ import { sound } from '../utils/sound';
 
 interface QuizScreenProps {
   questions: QuizQuestion[];
+  playerName?: string;
   onFinishGame: (stats: GameStats, answers: PlayerAnswer[]) => void;
   onQuitGame: () => void;
 }
@@ -17,6 +18,7 @@ const QUESTION_TIME_LIMIT = 15; // 15 seconds per lap
 
 export const QuizScreen: React.FC<QuizScreenProps> = ({
   questions,
+  playerName,
   onFinishGame,
   onQuitGame
 }) => {
@@ -156,6 +158,7 @@ export const QuizScreen: React.FC<QuizScreenProps> = ({
         score={score}
         streak={streak}
         answersLog={answersLog}
+        playerName={playerName}
       />
 
       {/* RPM Tachometer Timer */}

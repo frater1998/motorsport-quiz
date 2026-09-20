@@ -20,7 +20,8 @@ export const F2_CHAMPIONS: ChampionRecord[] = [
   { year: 2021, category: 'F2', driver: 'Oscar Piastri', team: 'Prema Racing', runnerUp: 'Robert Shwartzman', wins: 6, contextFact: 'Capolavoro da rookie: Piastri vinse F3 e F2 in anni consecutivi con 5 pole consecutive e 6 vittorie.' },
   { year: 2022, category: 'F2', driver: 'Felipe Drugovich', team: 'MP Motorsport', runnerUp: 'Théo Pourchaire', wins: 5, contextFact: 'Drugovich dominò il campionato regalando alla MP Motorsport il suo primo titolo piloti e team.' },
   { year: 2023, category: 'F2', driver: 'Théo Pourchaire', team: 'ART Grand Prix', runnerUp: 'Frederik Vesti', wins: 1, contextFact: 'Il giovane francese della Sauber Academy trionfò grazie a una costanza impeccabile di piazzamenti a punti.' },
-  { year: 2024, category: 'F2', driver: 'Gabriel Bortoleto', team: 'Invicta Racing', runnerUp: 'Isack Hadjar', wins: 2, contextFact: 'Bortoleto ha compiuto il "back-to-back" vincendo la Formula 3 2023 e la Formula 2 2024 da debuttante, guadagnando il sedile in F1.' }
+  { year: 2024, category: 'F2', driver: 'Gabriel Bortoleto', team: 'Invicta Racing', runnerUp: 'Isack Hadjar', wins: 2, contextFact: 'Bortoleto ha compiuto il "back-to-back" vincendo la Formula 3 2023 e la Formula 2 2024 da debuttante, guadagnando il sedile in F1.' },
+  { year: 2025, category: 'F2', driver: 'Leonardo Fornaroli', team: 'Invicta Racing', runnerUp: 'Jak Crawford', wins: 4, contextFact: 'Fornaroli ha conquistato il titolo mondiale F2 2025 con Invicta Racing da rookie, compiendo uno storico bis consecutivo dopo il titolo F3 2024.' }
 ];
 
 export const ICONIC_F2_RACES: JuniorSeriesRace[] = [

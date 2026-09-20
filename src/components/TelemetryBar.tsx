@@ -1,5 +1,5 @@
 import React from 'react';
-import { Trophy, Flame, Zap } from 'lucide-react';
+import { Trophy, Flame, Zap, User } from 'lucide-react';
 import { PlayerAnswer } from '../types';
 
 interface TelemetryBarProps {
@@ -8,6 +8,7 @@ interface TelemetryBarProps {
   score: number;
   streak: number;
   answersLog: PlayerAnswer[];
+  playerName?: string;
 }
 
 export const TelemetryBar: React.FC<TelemetryBarProps> = ({
@@ -15,12 +16,13 @@ export const TelemetryBar: React.FC<TelemetryBarProps> = ({
   totalQuestions,
   score,
   streak,
-  answersLog
+  answersLog,
+  playerName
 }) => {
   return (
     <div className="w-full bg-[#121620] border border-[#232936] rounded-xl p-3.5 mb-4 shadow-lg">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        {/* Lap Counter */}
+        {/* Lap Counter & Driver Name */}
         <div className="flex items-center gap-2">
           <div className="px-2.5 py-1 rounded bg-[#e10600] text-white font-digital font-black text-xs tracking-wider shadow-sm shadow-[#e10600]/40 flex items-center gap-1.5">
             <Zap className="w-3.5 h-3.5" />
@@ -30,9 +32,16 @@ export const TelemetryBar: React.FC<TelemetryBarProps> = ({
             </span>
             <span className="text-red-200 text-xs">/ {String(totalQuestions).padStart(2, '0')}</span>
           </div>
-          <span className="text-xs font-racing text-slate-400 hidden sm:inline">
-            Gran Premio Telemetria
-          </span>
+          {playerName ? (
+            <span className="text-xs font-racing text-slate-300 bg-[#171e2c] px-2.5 py-1 rounded border border-[#27354b] hidden sm:inline-flex items-center gap-1">
+              <User className="w-3 h-3 text-slate-400" />
+              <span>{playerName}</span>
+            </span>
+          ) : (
+            <span className="text-xs font-racing text-slate-400 hidden sm:inline">
+              Gran Premio Telemetria
+            </span>
+          )}
         </div>
 
         {/* Sectors Display (Mini-Flags for each lap) */}

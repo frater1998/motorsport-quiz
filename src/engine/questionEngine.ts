@@ -23,7 +23,7 @@ import { getSeasonWinners } from '../api/motorsportApi';
 function isYearInEra(year: number, era: Era): boolean {
   if (era === 'all') return true;
   if (era === '90s') return year >= 1990 && year <= 1999;
-  if (era === '00s') return year >= 2000 && year <= 2009;
+  if (era === '00s') return year >= 2000 && year <= 2013;
   if (era === 'hybrid') return year >= 2014 && year <= 2021;
   if (era === 'modern') return year >= 2022;
   return true;
@@ -34,16 +34,19 @@ interface GenerateQuizOptions {
   era: Era;
   liveGp: LiveGpInfo | null;
   count?: number;
+  excludeQuestions?: string[];
 }
 
 export async function generateQuizQuestions({
   category,
   era,
   liveGp,
-  count = 10
+  count = 10,
+  excludeQuestions = []
 }: GenerateQuizOptions): Promise<QuizQuestion[]> {
   const generated: QuizQuestion[] = [];
   const usedQuestionTitles = new Set<string>();
+  const excludedSet = new Set(excludeQuestions);
 
   const canUseF1 = category === 'F1' || category === 'ALL';
   const canUseF2 = category === 'F2' || category === 'ALL';
@@ -51,29 +54,44 @@ export async function generateQuizQuestions({
 
   // -------------------------------------------------------------
   // STEP 1: Live Grand Prix Auto-Update Injection
-  // If modern era or all history, and we have live GP info, inject live questions!
+  // Collect all available live questions and pick 1 (or at most 2 in modern era),
+  // prioritizing live questions that haven't been seen recently in this session.
   // -------------------------------------------------------------
   if (canUseF1 && liveGp && (era === 'modern' || era === 'all')) {
+    const liveQuestionsPool: QuizQuestion[] = [];
+
     const liveWinnerQ = createLiveRaceWinnerQuestion(liveGp);
-    generated.push(liveWinnerQ);
-    usedQuestionTitles.add(liveWinnerQ.question);
+    liveQuestionsPool.push(liveWinnerQ);
 
     const liveLeaderQ = createLiveChampionshipLeaderQuestion(liveGp);
-    if (liveLeaderQ && Math.random() > 0.3) {
-      generated.push(liveLeaderQ);
-      usedQuestionTitles.add(liveLeaderQ.question);
+    if (liveLeaderQ) {
+      liveQuestionsPool.push(liveLeaderQ);
     }
 
     const livePodiumQ = createLivePodiumQuestion(liveGp);
-    if (livePodiumQ && Math.random() > 0.5) {
-      generated.push(livePodiumQ);
-      usedQuestionTitles.add(livePodiumQ.question);
+    if (livePodiumQ) {
+      liveQuestionsPool.push(livePodiumQ);
     }
 
     const liveConstructorQ = createLiveConstructorLeaderQuestion(liveGp);
-    if (liveConstructorQ && Math.random() > 0.5) {
-      generated.push(liveConstructorQ);
-      usedQuestionTitles.add(liveConstructorQ.question);
+    if (liveConstructorQ) {
+      liveQuestionsPool.push(liveConstructorQ);
+    }
+
+    // Separate unseen live questions vs recently seen live questions
+    const unseenLive = liveQuestionsPool.filter(q => !excludedSet.has(q.question));
+    const poolToPickLive = unseenLive.length > 0 ? unseenLive : liveQuestionsPool;
+    const shuffledLive = shuffleArray(poolToPickLive);
+
+    // Limit live questions to 1 (or 2 with 40% probability in modern era)
+    // to prevent every game from repeating the exact same 4 live questions.
+    const maxLive = era === 'modern' ? (Math.random() < 0.4 ? 2 : 1) : 1;
+    for (const q of shuffledLive) {
+      if (generated.length >= maxLive) break;
+      if (!usedQuestionTitles.has(q.question)) {
+        generated.push(q);
+        usedQuestionTitles.add(q.question);
+      }
     }
   }
 
@@ -85,20 +103,24 @@ export async function generateQuizQuestions({
     try {
       let candidateYears: number[] = [];
       if (era === '90s') candidateYears = [1991, 1994, 1997, 1998, 1999];
-      else if (era === '00s') candidateYears = [2000, 2003, 2005, 2007, 2008];
+      else if (era === '00s') candidateYears = [2000, 2003, 2005, 2007, 2008, 2010, 2012];
       else if (era === 'hybrid') candidateYears = [2014, 2016, 2018, 2020, 2021];
       else if (era === 'modern') candidateYears = [2022, 2023, 2024];
-      else candidateYears = [1995, 2002, 2008, 2016, 2021, 2024];
+      else candidateYears = [1995, 2002, 2008, 2012, 2016, 2021, 2024];
 
-      const randomYear = candidateYears[Math.floor(Math.random() * candidateYears.length)];
+      const shuffledYears = shuffleArray(candidateYears);
+      const randomYear = shuffledYears[0];
       const apiRaces = await getSeasonWinners(randomYear);
 
       if (apiRaces && apiRaces.length > 0) {
-        const randomRace = apiRaces[Math.floor(Math.random() * apiRaces.length)];
-        const q = createGpWinnerQuestion(randomRace);
-        if (!usedQuestionTitles.has(q.question)) {
-          generated.push(q);
-          usedQuestionTitles.add(q.question);
+        const shuffledApiRaces = shuffleArray(apiRaces);
+        for (const race of shuffledApiRaces) {
+          const q = createGpWinnerQuestion(race);
+          if (!usedQuestionTitles.has(q.question) && !excludedSet.has(q.question)) {
+            generated.push(q);
+            usedQuestionTitles.add(q.question);
+            break;
+          }
         }
       }
     } catch {
@@ -164,11 +186,15 @@ export async function generateQuizQuestions({
     });
   }
 
-  // Shuffle pool
-  const shuffledPool = shuffleArray(pool);
+  // Separate pool into unseen questions (not recently played) and seen questions
+  const unseenPool = pool.filter(q => !excludedSet.has(q.question));
+  const seenPool = pool.filter(q => excludedSet.has(q.question));
 
-  // Fill up to count
-  for (const q of shuffledPool) {
+  const shuffledUnseen = shuffleArray(unseenPool);
+  const shuffledSeen = shuffleArray(seenPool);
+
+  // First pass: fill up to count with fresh questions never seen in recent games
+  for (const q of shuffledUnseen) {
     if (generated.length >= count) break;
     if (!usedQuestionTitles.has(q.question)) {
       generated.push(q);
@@ -176,6 +202,21 @@ export async function generateQuizQuestions({
     }
   }
 
-  // Return exactly count items (or as many as available)
-  return generated.slice(0, count);
+  // Second pass: fallback to seen questions if pool was smaller than count
+  if (generated.length < count) {
+    for (const q of shuffledSeen) {
+      if (generated.length >= count) break;
+      if (!usedQuestionTitles.has(q.question)) {
+        generated.push(q);
+        usedQuestionTitles.add(q.question);
+      }
+    }
+  }
+
+  // -------------------------------------------------------------
+  // STEP 4: Complete Randomization of Final Question Order
+  // Randomizes the entire questions array so live/API questions
+  // are never always in the first slots, giving a fresh order every race.
+  // -------------------------------------------------------------
+  return shuffleArray(generated).slice(0, count);
 }
